@@ -16,6 +16,9 @@ Objectif:
 - scanner le workspace sans envoyer de donnees a l'exterieur;
 - generer une carte projet locale dans `.project-map/`;
 - detecter routes, fichiers sensibles, dependances, donnees, docs, risques, seuils CI et impact avant/apres;
+- produire un preflight avant changement sensible: fichiers requis, risques, blockers, commandes de validation et budget contexte;
+- utiliser un cache incremental local pour reduire les rescans et le bruit token;
+- exposer si utile un MCP local en stdio pour interroger la carte projet depuis Codex, Claude Code ou un assistant compatible;
 - distinguer clairement surface publique, espace utilisateur prive, dashboard admin et monitoring interne;
 - inventorier les agents IA, sous-agents, outils, prompts, modeles, budgets et delegations;
 - produire une topologie d'agents reutilisable par Codex, Claude Code et les agents metier du produit;
@@ -44,8 +47,8 @@ Ordre obligatoire:
 4. Cartographier les surfaces publiques/privees/admin/monitoring et leurs donnees.
 5. Cartographier les agents IA, sous-agents, prompts, outils, quotas et risques si le projet en utilise ou en prevoit.
 6. Installer CodeGraph Studio.
-7. Ajouter scripts, tests, GraphView, CI et documentation.
-8. Valider avec tests, build, scan, security, baseline, diff, ci, github.
+7. Ajouter scripts, tests, GraphView, preflight, CI, MCP local optionnel et documentation.
+8. Valider avec tests, build, scan, security, preflight, baseline, diff, ci, github.
 9. Mettre a jour roadmap/document de suivi.
 
 Definition of Done:
@@ -54,6 +57,7 @@ Definition of Done:
 - code mort et fichiers inutiles listes, puis supprimes/adaptes seulement apres validation;
 - matrice public/prive/admin/monitoring generee avec gardes, donnees et tests associes;
 - `.project-map/index.html` s'ouvre localement;
+- `.project-map/preflight.md` et `.project-map/preflight.json` existent pour cadrer une modification sensible;
 - `.project-map/agents-manifest.json` et `.project-map/agent-topology.md` existent si le projet contient des agents;
 - `codegraph:ci` passe avec 0 blocker;
 - une route privee sans garde ou une action sensible sans owner/admin check fait echouer `codegraph:ci`;
@@ -71,8 +75,11 @@ Il doit concurrencer un outil de type Graphify sur le besoin personnel suivant:
 - carte locale du projet;
 - graphe visuel;
 - analyse de risques;
+- preflight avant changement sensible;
 - comparaison avant/apres;
 - CI bloquante;
+- cache incremental local;
+- MCP local optionnel;
 - resume GitHub;
 - contexte IA court;
 - cartographie agents/sous-agents;
@@ -378,8 +385,10 @@ Adapter les noms au projet:
 
 ```txt
 scripts/project-codegraph.mjs
+scripts/project-codegraph-mcp.mjs
 scripts/lib/codegraph/
   config.mjs
+  build-graph.mjs
   scan-files.mjs
   parse-imports.mjs
   parse-routes.mjs
@@ -388,6 +397,7 @@ scripts/lib/codegraph/
   risk-rules.mjs
   baseline-diff.mjs
   gates.mjs
+  preflight.mjs
   github-report.mjs
   visual-graph.mjs
   graphview.mjs
@@ -408,10 +418,13 @@ scripts/lib/codegraph/*.test.mjs
   "codegraph:report": "node scripts/project-codegraph.mjs report",
   "codegraph:security": "node scripts/project-codegraph.mjs security",
   "codegraph:query": "node scripts/project-codegraph.mjs query",
+  "codegraph:impact": "node scripts/project-codegraph.mjs impact",
+  "codegraph:preflight": "node scripts/project-codegraph.mjs preflight",
   "codegraph:baseline": "node scripts/project-codegraph.mjs baseline",
   "codegraph:diff": "node scripts/project-codegraph.mjs diff",
   "codegraph:ci": "node scripts/project-codegraph.mjs ci",
-  "codegraph:github": "node scripts/project-codegraph.mjs github"
+  "codegraph:github": "node scripts/project-codegraph.mjs github",
+  "codegraph:mcp": "node scripts/project-codegraph-mcp.mjs"
 }
 ```
 
@@ -434,6 +447,8 @@ Ajouter:
   codex-context.md
   claude-context.md
   security-report.md
+  preflight.md
+  preflight.json
   product-flows.md
   architecture-graph.md
   architecture-graph.mmd
@@ -456,6 +471,7 @@ Ajouter:
   baseline.json
   diff.json
   gates.json
+  scan-cache.json
   handoff-packets/
 ```
 
@@ -466,6 +482,7 @@ Pour optimiser les tokens:
 - `ai-context.md`: contexte assistant generique;
 - `codex-context.md`: contexte court pour Codex;
 - `claude-context.md`: contexte court pour Claude Code.
+- `preflight.md`: contexte minimal avant une modification ciblee.
 
 Chaque fichier doit:
 
@@ -663,6 +680,7 @@ Produire:
 
 - `PROJECT_MAP.md`: carte complete mais concise;
 - `ai-context.md`: ultra court;
+- `preflight.md`: fichiers requis, blockers, commandes et budget contexte avant changement sensible;
 - `change-impact.md`: uniquement ce qui a change;
 - `github-summary.md`: synthese PR/CI;
 - `handoff-packets/`: contextes minuscules pour sous-agents;
@@ -673,6 +691,7 @@ Produire:
 Pour un assistant IA:
 
 - lire d'abord `ai-context.md`;
+- lancer `codegraph:preflight` et lire `preflight.md` avant tout changement sensible;
 - lire ensuite `change-impact.md` s'il existe;
 - lire seulement les fichiers cites;
 - ne lire les docs strategiques que si la tache est produit/business;
@@ -809,14 +828,15 @@ Avant changement sensible:
 ```bash
 npm run codegraph:baseline
 npm run codegraph:scan
+npm run codegraph:preflight -- "zone ou changement vise"
 ```
 
 Lire:
 
 ```txt
+.project-map/preflight.md
 .project-map/ai-context.md
 .project-map/codex-context.md ou .project-map/claude-context.md
-.project-map/PROJECT_MAP.md
 .project-map/index.html
 ```
 
@@ -842,6 +862,7 @@ Puis:
 Codex doit lire en priorite:
 
 ```txt
+.project-map/preflight.md
 .project-map/codex-context.md
 .project-map/change-impact.md
 .project-map/agents-manifest.json
@@ -862,6 +883,7 @@ Le sous-agent ne doit pas recevoir plus de contexte que ce paquet et les fichier
 Claude Code doit lire en priorite:
 
 ```txt
+.project-map/preflight.md
 .project-map/claude-context.md
 .project-map/change-impact.md
 .project-map/agents-manifest.json
@@ -883,9 +905,10 @@ Alors ajouter une section:
 ```txt
 Avant chaque changement sensible, executer CodeGraph:
 1. npm run codegraph:scan
-2. lire .project-map/claude-context.md
-3. si auth/data/payment/IA: npm run codegraph:security
-4. apres changement: npm run codegraph:diff && npm run codegraph:ci
+2. npm run codegraph:preflight -- "zone ou changement vise"
+3. lire .project-map/preflight.md puis .project-map/claude-context.md
+4. si auth/data/payment/IA: npm run codegraph:security
+5. apres changement: npm run codegraph:diff && npm run codegraph:ci
 ```
 
 ### Assistant neutre
@@ -907,6 +930,26 @@ Si le projet utilise des sous-agents, maintenir aussi:
 ```
 
 comme couche commune de delegation.
+
+### MCP local optionnel
+
+Si l'assistant ou l'IDE peut consommer un MCP stdio, ajouter `codegraph:mcp`.
+
+Outils recommandes:
+
+- `query_graph`: repondre a une question projet depuis la carte locale;
+- `impact_analysis`: produire le plan d'impact d'une zone;
+- `security_check`: retourner blockers, warnings et findings;
+- `preflight`: retourner fichiers requis, commandes, blockers, warnings et budget contexte;
+- `get_file_context`: retourner les metadonnees d'un fichier sans exposer tout son contenu.
+
+Regles MCP:
+
+- stdio local uniquement par defaut;
+- aucun reseau requis;
+- pas de secrets dans les reponses;
+- pas de contenu complet de fichier sauf demande explicite et sure;
+- les outils doivent reconstruire ou lire une carte locale a jour avant de repondre.
 
 ## Adaptation par type de projet
 
@@ -983,6 +1026,7 @@ Priorites:
 ## Maintenance
 
 - Relancer CodeGraph avant toute refonte large.
+- Lancer `codegraph:preflight` avant toute modification sensible ou multi-surface.
 - Ne jamais versionner `.project-map/` par defaut.
 - Versionner uniquement le code du scanner, les tests, la workflow et la documentation.
 - Ajouter une regle de risque des qu'une nouvelle surface sensible apparait.
@@ -1008,6 +1052,9 @@ Priorites:
 - [ ] Scripts CodeGraph ajoutes.
 - [ ] Tests CodeGraph ajoutes.
 - [ ] GraphView genere.
+- [ ] Preflight genere pour au moins une zone sensible.
+- [ ] Cache incremental local actif ou explicitement desactive.
+- [ ] MCP local ajoute si l'IDE ou l'assistant cible le supporte.
 - [ ] Contextes Codex/Claude generes.
 - [ ] Agents IA inventories si presents ou prevus.
 - [ ] Topologie agents/sous-agents generee.

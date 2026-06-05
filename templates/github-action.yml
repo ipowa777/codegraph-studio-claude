@@ -21,6 +21,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npm run codegraph:preflight -- "ci change"
       - run: npm run codegraph:ci
       - if: always()
         uses: actions/upload-artifact@v4

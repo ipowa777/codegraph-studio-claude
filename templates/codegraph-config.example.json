@@ -42,6 +42,27 @@
     "monitoringPrivate": [],
     "system": []
   },
+  "features": {
+    "incrementalScanCache": true,
+    "preflight": true,
+    "mcpStdio": false,
+    "graphView": true,
+    "handoffPackets": true,
+    "tokenIntelligence": true
+  },
+  "preflight": {
+    "defaultContextFiles": [
+      ".project-map/ai-context.md",
+      ".project-map/codex-context.md",
+      ".project-map/claude-context.md",
+      ".project-map/access-matrix.md",
+      ".project-map/test-plan.md",
+      "docs/README.md",
+      "docs/roadmap.md"
+    ],
+    "blockOnP0Impact": true,
+    "maxRequiredFiles": 40
+  },
   "ci": {
     "maxBlockers": 0,
     "maxWarnings": 0

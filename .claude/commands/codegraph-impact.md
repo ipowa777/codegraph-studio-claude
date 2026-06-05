@@ -8,6 +8,7 @@ Usage examples:
 npm run codegraph:impact -- src/app/admin
 npm run codegraph:impact -- agents
 npm run codegraph:impact -- billing
+npm run codegraph:preflight -- billing
 ```
 
 Steps:
@@ -30,3 +31,5 @@ Steps:
 - sensitive surfaces;
 - recommended tests;
 - risks P0/P1/P2.
+
+If the impact includes P0 risk, admin, monitoring, payment, auth, user data, production, destructive actions, or autonomous agents, run `npm run codegraph:preflight -- target` and read `.project-map/preflight.md` before editing.

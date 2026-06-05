@@ -22,10 +22,12 @@ npm run codegraph:scan
 npm run codegraph:security
 npm run codegraph:query -- "question"
 npm run codegraph:impact -- target
+npm run codegraph:preflight -- target
 npm run codegraph:baseline
 npm run codegraph:diff
 npm run codegraph:ci
 npm run codegraph:github
+npm run codegraph:mcp
 ```
 
 If the target project already uses different names, adapt the commands but keep the same behavior.
@@ -36,6 +38,7 @@ Before a sensitive change, read in this order:
 
 ```txt
 .project-map/ai-context.md
+.project-map/preflight.md
 .project-map/claude-context.md
 .project-map/change-impact.md
 .project-map/access-matrix.md
@@ -51,6 +54,7 @@ Do not read the full repository by default. Follow `.project-map/handoff-packets
 - Never read, copy, log, or commit secrets.
 - Never version `.project-map/` by default.
 - Never delete files without explicit user validation.
+- Run `codegraph:preflight` before sensitive changes and read only the files it names first.
 - Keep generated AI contexts short and source-linked.
 - Treat public, user-private, admin-private, monitoring-private, and system surfaces separately.
 - Give sub-agents only the smallest handoff packet needed.
@@ -61,9 +65,20 @@ Do not read the full repository by default. Follow `.project-map/handoff-packets
 After implementation or adaptation:
 
 ```bash
+npm run codegraph:preflight -- "target"
 npm run codegraph:scan
 npm run codegraph:security
 npm run codegraph:ci
 ```
 
 Also run the target project's normal typecheck, tests, build, and e2e commands when available.
+
+## Optional MCP
+
+If Claude Code or the IDE can consume stdio MCP servers, expose `npm run codegraph:mcp` with local-only tools:
+
+- `query_graph`
+- `impact_analysis`
+- `security_check`
+- `preflight`
+- `get_file_context`
