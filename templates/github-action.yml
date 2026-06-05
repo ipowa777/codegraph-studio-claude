@@ -1,0 +1,30 @@
+name: CodeGraph
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  codegraph:
+    runs-on: ubuntu-latest
+    env:
+      CODEGRAPH_MAX_BLOCKERS: "0"
+      CODEGRAPH_MAX_WARNINGS: "0"
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run codegraph:ci
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-codegraph
+          path: .project-map/
+          if-no-files-found: ignore

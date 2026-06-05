@@ -1,0 +1,49 @@
+{
+  "projectName": "project",
+  "outputDir": ".project-map",
+  "scanRoots": [
+    "src",
+    "app",
+    "pages",
+    "components",
+    "lib",
+    "server",
+    "scripts",
+    "tests",
+    "docs",
+    ".github"
+  ],
+  "rootFiles": [
+    "package.json",
+    "tsconfig.json",
+    "next.config.ts",
+    "vite.config.ts",
+    "vitest.config.ts",
+    "playwright.config.ts",
+    ".env.example",
+    ".gitignore",
+    "CLAUDE.md"
+  ],
+  "ignoreSegments": [
+    ".git",
+    ".next",
+    ".project-map",
+    "artifacts",
+    "coverage",
+    "dist",
+    "node_modules",
+    "playwright-report",
+    "test-results"
+  ],
+  "accessSurfaces": {
+    "public": [],
+    "userPrivate": [],
+    "adminPrivate": [],
+    "monitoringPrivate": [],
+    "system": []
+  },
+  "ci": {
+    "maxBlockers": 0,
+    "maxWarnings": 0
+  }
+}
