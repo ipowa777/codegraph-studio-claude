@@ -12,6 +12,17 @@ references/codegraph-reuse-directive.md
 
 This repository is project-neutral. Do not add references to a client, product, or source project.
 
+## Roadmap
+
+Planned innovations are documented in `references/codegraph-improvements.md`,
+organized by axis: token economy, security, AI agent management, performance,
+and developer experience. Highlights:
+
+- Token Ledger — measure tokens spent vs saved per preflight (the key differentiator).
+- Access matrix diff — alert on security regressions (lost guard, dropped RLS).
+- Architecture drift detector — enforce project conventions automatically.
+- Agent cost cartography — map per-agent model, prompt size, and cost.
+
 ## Capabilities
 
 - Phase 0 audit with P0/P1/P2 priorities before integration.
