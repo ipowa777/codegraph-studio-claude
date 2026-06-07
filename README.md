@@ -32,7 +32,7 @@ Full v3 specs live in `references/specs/`:
 
 New slash commands: `codegraph:savings`, `:secrets-guard`, `:access-diff`,
 `:exposure`, `:agent-cost`, `:agent-map`, `:health`, `:drift`, `:hotspots`,
-`:onboard`, `:adr`.
+`:onboard`, `:adr`, `:dashboard`.
 
 Cross-cutting rule: every displayed metric (token savings, score, cost) must
 state its method and flag estimates. No marketing figure without an explicit baseline.

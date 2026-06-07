@@ -1075,6 +1075,7 @@ Claude Code implémente ces specs dans le projet cible (scripts/lib/codegraph/).
 - `specs/spec-agents.md` — agent cost cartography, prompt drift, orchestration, hallucination flag.
 - `specs/spec-performance.md` — health score, architecture drift detector, hotspot radar.
 - `specs/spec-dev-experience.md` — auto-onboarding, handoff generator, ADR/decision log.
+- `specs/spec-dashboard.md` — Control Tower : dashboard HTML local agrégeant toutes les sorties.
 
 Roadmap et priorisation : `references/codegraph-improvements.md`.
 
