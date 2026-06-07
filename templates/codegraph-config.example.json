@@ -1,70 +1,44 @@
 {
   "projectName": "project",
   "outputDir": ".project-map",
-  "scanRoots": [
-    "src",
-    "app",
-    "pages",
-    "components",
-    "lib",
-    "server",
-    "scripts",
-    "tests",
-    "docs",
-    ".github"
-  ],
-  "rootFiles": [
-    "package.json",
-    "tsconfig.json",
-    "next.config.ts",
-    "vite.config.ts",
-    "vitest.config.ts",
-    "playwright.config.ts",
-    ".env.example",
-    ".gitignore",
-    "CLAUDE.md"
-  ],
-  "ignoreSegments": [
-    ".git",
-    ".next",
-    ".project-map",
-    "artifacts",
-    "coverage",
-    "dist",
-    "node_modules",
-    "playwright-report",
-    "test-results"
-  ],
-  "accessSurfaces": {
-    "public": [],
-    "userPrivate": [],
-    "adminPrivate": [],
-    "monitoringPrivate": [],
-    "system": []
-  },
+  "scanRoots": ["src", "app", "pages", "components", "lib", "server", "scripts", "tests", "docs", ".github"],
+  "rootFiles": ["package.json", "tsconfig.json", "next.config.ts", "vite.config.ts", "vitest.config.ts", "playwright.config.ts", ".env.example", ".gitignore", "CLAUDE.md"],
+  "ignoreSegments": [".git", ".next", ".project-map", "artifacts", "coverage", "dist", "node_modules", "playwright-report", "test-results"],
+  "accessSurfaces": { "public": [], "userPrivate": [], "adminPrivate": [], "monitoringPrivate": [], "system": [] },
   "features": {
-    "incrementalScanCache": true,
-    "preflight": true,
-    "mcpStdio": false,
-    "graphView": true,
-    "handoffPackets": true,
-    "tokenIntelligence": true
+    "incrementalScanCache": true, "preflight": true, "mcpStdio": false, "graphView": true,
+    "handoffPackets": true, "tokenIntelligence": true, "tokenLedger": true, "secretGuard": true,
+    "accessDiff": true, "exposureScore": true, "agentCartography": true, "healthScore": true,
+    "driftDetector": true, "hotspots": true, "onboarding": true, "adr": false
   },
   "preflight": {
-    "defaultContextFiles": [
-      ".project-map/ai-context.md",
-      ".project-map/codex-context.md",
-      ".project-map/claude-context.md",
-      ".project-map/access-matrix.md",
-      ".project-map/test-plan.md",
-      "docs/README.md",
-      "docs/roadmap.md"
-    ],
-    "blockOnP0Impact": true,
-    "maxRequiredFiles": 40
+    "defaultContextFiles": [".project-map/ai-context.md", ".project-map/codex-context.md", ".project-map/claude-context.md", ".project-map/access-matrix.md", ".project-map/test-plan.md", "docs/README.md", "docs/roadmap.md"],
+    "blockOnP0Impact": true, "maxRequiredFiles": 40
   },
-  "ci": {
-    "maxBlockers": 0,
-    "maxWarnings": 0
-  }
+  "tokenLedger": {
+    "baseline": "relevant-full",
+    "maxContextTokens": 8000,
+    "charsPerToken": { "en": 4, "fr": 3.6, "code": 3.4 }
+  },
+  "pricing": {
+    "_comment": "USD per million tokens. Remplir avec les tarifs du/des modeles utilises.",
+    "example-model": { "input": 0.8, "output": 4.0 }
+  },
+  "security": {
+    "sensitiveCols": ["subscription_status", "is_admin", "role", "balance"],
+    "secretAllowlist": []
+  },
+  "conventions": [
+    { "id": "no-direct-fetch", "description": "Utiliser le wrapper reseau interne, jamais fetch() direct", "match": { "glob": "**/*.{ts,tsx}", "pattern": "\\bfetch\\(", "not_pattern": "callEdgeFunction" }, "severity": "P1", "advice": "Remplacer fetch() par le wrapper reseau interne" },
+    { "id": "prefer-maybe-single", "description": "Preferer .maybeSingle() a .single()", "match": { "glob": "**/*.{ts,tsx}", "pattern": "\\.single\\(" }, "severity": "P2", "advice": "Remplacer .single() par .maybeSingle()" }
+  ],
+  "agents": {
+    "costTable": null, "heavyPromptTokens": 1500, "maxDelegationDepth": 3,
+    "sensitiveSinks": ["insert", "update", "delete", "charge", "sendEmail", "exec", "query"],
+    "validators": ["zodParse", "validateOutput", "assertSchema"]
+  },
+  "hotspots": { "churnWindowDays": 90, "topN": 15 },
+  "health": { "weights": { "security": 0.30, "debt": 0.25, "docs": 0.15, "drift": 0.20, "duplication": 0.10 } },
+  "adr": { "versioned": true, "decisionMarker": "[DECISION]" },
+  "ci": { "maxBlockers": 0, "maxWarnings": 0, "failOnAccessRegressionP0": true, "failOnSecretLeak": true, "failOnNewDriftP0": true }
 }

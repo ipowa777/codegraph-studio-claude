@@ -23,6 +23,20 @@ and developer experience. Highlights:
 - Architecture drift detector — enforce project conventions automatically.
 - Agent cost cartography — map per-agent model, prompt size, and cost.
 
+Full v3 specs live in `references/specs/`:
+- `spec-token-economy.md` (token ledger, budget enforcer, file slices)
+- `spec-security.md` (secret leak guard, access matrix diff, exposure score)
+- `spec-agents.md` (agent cost, prompt drift, orchestration, hallucination flag)
+- `spec-performance.md` (health score, drift detector, hotspot radar)
+- `spec-dev-experience.md` (auto-onboarding, handoff generator, ADR/decision log)
+
+New slash commands: `codegraph:savings`, `:secrets-guard`, `:access-diff`,
+`:exposure`, `:agent-cost`, `:agent-map`, `:health`, `:drift`, `:hotspots`,
+`:onboard`, `:adr`.
+
+Cross-cutting rule: every displayed metric (token savings, score, cost) must
+state its method and flag estimates. No marketing figure without an explicit baseline.
+
 ## Capabilities
 
 - Phase 0 audit with P0/P1/P2 priorities before integration.
