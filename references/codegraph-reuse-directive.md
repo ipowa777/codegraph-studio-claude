@@ -1063,3 +1063,21 @@ Priorites:
 - [ ] CI CodeGraph ajoutee.
 - [ ] Roadmap mise a jour.
 - [ ] Validation complete passee.
+
+## Extensions v3 (specs détaillées)
+
+Les fonctionnalités avancées sont spécifiées dans `references/specs/`. Chaque
+spec décrit entrées/sorties, fichiers à générer, algorithme et format JSON.
+Claude Code implémente ces specs dans le projet cible (scripts/lib/codegraph/).
+
+- `specs/spec-token-economy.md` — Token Ledger, budget enforcer, file slices.
+- `specs/spec-security.md` — secret leak guard, access matrix diff, exposure score.
+- `specs/spec-agents.md` — agent cost cartography, prompt drift, orchestration, hallucination flag.
+- `specs/spec-performance.md` — health score, architecture drift detector, hotspot radar.
+- `specs/spec-dev-experience.md` — auto-onboarding, handoff generator, ADR/decision log.
+
+Roadmap et priorisation : `references/codegraph-improvements.md`.
+
+Règle d'or transverse : toute métrique affichée (économie de tokens, score,
+coût) doit indiquer sa méthode de calcul et signaler quand il s'agit d'une
+estimation. Pas de chiffre marketing sans baseline explicite.
